@@ -16,7 +16,7 @@ timezone:
 
 title: yonghun # the main title
 
-tagline: A text-focused Jekyll theme # it will display as the subtitle
+tagline: Java · Spring · CS · Database 학습 기록 # it will display as the subtitle
 
 description: >- # used by seo meta and the atom feed
   A minimal, responsive and feature-rich Jekyll theme for technical writing.

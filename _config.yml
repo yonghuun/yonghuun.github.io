@@ -1,178 +1,191 @@
-# The Site Configuration
+# =========================================================
+# 고용훈 Backend Developer Portfolio
+# =========================================================
 
-# Import the theme
 theme: jekyll-theme-chirpy
 
-# The language of the webpage › http://www.lingoes.net/en/translator/langcode.htm
-# If it has the same name as one of the files in folder `_data/locales`, the layout language will also be changed,
-# otherwise, the layout language will use the default value of 'en'.
-lang: en
+# ---------------------------------------------------------
+# Language & Timezone
+# ---------------------------------------------------------
 
-# Change to your timezone › https://zones.arilyn.cc
-timezone:
+lang: ko-KR
+timezone: Asia/Seoul
 
-# jekyll-seo-tag settings › https://github.com/jekyll/jekyll-seo-tag/blob/master/docs/usage.md
-# ↓ --------------------------
+# ---------------------------------------------------------
+# Site Information
+# ---------------------------------------------------------
 
-title: yonghun # the main title
+title: 고용훈
+tagline: Backend Developer
 
-tagline: Java · Spring · CS · Database 학습 기록 # it will display as the subtitle
+description: >-
+  Java와 Spring Boot를 중심으로 백엔드 시스템을 개발합니다.
+  로그와 실행 계획을 기반으로 문제의 원인을 분석하고,
+  성능과 구조를 개선하는 과정을 기록합니다.
 
-description: >- # used by seo meta and the atom feed
-  A minimal, responsive and feature-rich Jekyll theme for technical writing.
+url: "https://yonghuun.github.io"
+baseurl: ""
 
-# Fill in the protocol & hostname for your site.
-# E.g. 'https://username.github.io', note that it does not end with a '/'.
-url: ""
+# ---------------------------------------------------------
+# GitHub & Social
+# ---------------------------------------------------------
 
 github:
-  username: github_username # change to your GitHub username
+  username: yonghuun
 
 twitter:
-  username: twitter_username # change to your Twitter username
+  username:
 
 social:
-  # Change to your full name.
-  # It will be displayed as the default author of the posts and the copyright owner in the Footer
-  name: your_full_name
-  email: example@domain.com # change to your email address
-  fediverse_handle: # fill in your fediverse handle. E.g. "@username@domain.com"
+  name: 고용훈
+
+  # 실제 공개할 이메일이 정해지면 입력
+  # 예: email: example@gmail.com
+  email:
+
+  fediverse_handle:
+
   links:
-    # The first element serves as the copyright owner's link
-    - https://twitter.com/username # change to your Twitter homepage
-    - https://github.com/username # change to your GitHub homepage
-    # Uncomment below to add more social links
-    # - https://www.facebook.com/username
-    # - https://www.linkedin.com/in/username
+    - https://github.com/yonghuun
 
-# Site Verification Settings
+    # LinkedIn 또는 다른 포트폴리오가 생기면 아래처럼 추가
+    # - https://www.linkedin.com/in/사용자명
+    # - https://velog.io/@사용자명
+
+# ---------------------------------------------------------
+# Search Engine Verification
+# ---------------------------------------------------------
+
 webmaster_verifications:
-  google: # fill in your Google verification code
-  bing: # fill in your Bing verification code
-  alexa: # fill in your Alexa verification code
-  yandex: # fill in your Yandex verification code
-  baidu: # fill in your Baidu verification code
-  facebook: # fill in your Facebook verification code
+  google:
+  bing:
+  alexa:
+  yandex:
+  baidu:
+  facebook:
 
-# ↑ --------------------------
-# The end of `jekyll-seo-tag` settings
+# ---------------------------------------------------------
+# Analytics
+# ---------------------------------------------------------
 
-# Web Analytics Settings
 analytics:
   google:
-    id: # fill in your Google Analytics ID
+    id:
   goatcounter:
-    id: # fill in your GoatCounter ID
+    id:
   umami:
-    id: # fill in your Umami ID
-    domain: # fill in your Umami domain
+    id:
+    domain:
   matomo:
-    id: # fill in your Matomo ID
-    domain: # fill in your Matomo domain
+    id:
+    domain:
   cloudflare:
-    id: # fill in your Cloudflare Web Analytics token
+    id:
   fathom:
-    id: # fill in your Fathom Site ID
+    id:
 
-# Page views settings
 pageviews:
-  provider: # now only supports 'goatcounter'
+  provider:
 
-# Prefer color scheme setting.
-#
-# Note: Keep empty will follow the system prefer color by default,
-# and there will be a toggle to switch the theme between dark and light
-# on the bottom left of the sidebar.
-#
-# Available options:
-#
-#     light — Use the light color scheme
-#     dark — Use the dark color scheme
-#
-theme_mode: # [light | dark]
+# ---------------------------------------------------------
+# Appearance
+# ---------------------------------------------------------
 
-# The CDN endpoint for media resources.
-# Notice that once it is assigned, the CDN url
-# will be added to all media resources (site avatar, posts' images, audio and video files) paths starting with '/'
-#
-# e.g. 'https://cdn.com'
+# 기본 화면을 다크 모드로 시작
+theme_mode: dark
+
 cdn:
 
-# the avatar on sidebar, support local or CORS resources
+# 프로필 이미지를 등록한 뒤 경로 입력
+# 예: avatar: /assets/img/profile.png
 avatar:
 
-# The URL of the site-wide social preview image used in SEO `og:image` meta tag.
-# It can be overridden by a customized `page.image` in front matter.
-social_preview_image: # string, local or CORS resources
+# SNS 또는 카카오톡 공유 시 나타나는 대표 이미지
+# 예: social_preview_image: /assets/img/site-preview.png
+social_preview_image:
 
-# boolean type, the global switch for TOC in posts.
+# 게시글 목차 표시
 toc: true
 
-actions:
-  # Display "Edit this post" action on each post page to encourage contributions.
-  edit_post:
-    enabled: false # set to true to display the "Edit this post" action.
-    url: "" # repository base URL, e.g. https://github.com/cotes2020/jekyll-theme-chirpy/edit/master
-    # Use dynamic or static URL for the edit link.
-    # If `static_url` is false, the post's path will be appended to the `url` above as the final edit link.
-    # Set to true if the URL should remain unchanged, which means each post will share the same edit link.
-    static_url: false # [ true | false ]
+# ---------------------------------------------------------
+# Post Actions
+# ---------------------------------------------------------
 
+actions:
+  edit_post:
+    enabled: false
+    url: ""
+    static_url: false
+
+# ---------------------------------------------------------
+# Comments
+# ---------------------------------------------------------
+
+# 포트폴리오 초기 단계에서는 댓글 기능 비활성화
 comments:
-  # Global switch for the post-comment system. Keeping it empty means disabled.
-  provider: # [disqus | utterances | giscus]
-  # The provider options are as follows:
+  provider:
+
   disqus:
-    shortname: # fill with the Disqus shortname. › https://help.disqus.com/en/articles/1717111-what-s-a-shortname
-  # utterances settings › https://utteranc.es/
+    shortname:
+
   utterances:
-    repo: # <gh-username>/<repo>
-    issue_term: # < url | pathname | title | ...>
-  # Giscus options › https://giscus.app
+    repo:
+    issue_term:
+
   giscus:
-    repo: # <gh-username>/<repo>
+    repo:
     repo_id:
     category:
     category_id:
-    mapping: # optional, default to 'pathname'
-    strict: # optional, default to '0'
-    input_position: # optional, default to 'bottom'
-    lang: # optional, default to the value of `site.lang`
-    reactions_enabled: # optional, default to the value of `1`
+    mapping:
+    strict:
+    input_position:
+    lang: ko
+    reactions_enabled:
 
-# Self-hosted static assets, optional › https://github.com/cotes2020/chirpy-static-assets
+# ---------------------------------------------------------
+# Static Assets
+# ---------------------------------------------------------
+
 assets:
   self_host:
-    enabled: # boolean, keep empty means false
-    # specify the Jekyll environment, empty means both
-    # only works if `assets.self_host.enabled` is 'true'
-    env: # [development | production]
+    enabled:
+    env:
+
+# ---------------------------------------------------------
+# PWA
+# ---------------------------------------------------------
 
 pwa:
-  enabled: true # The option for PWA feature (installable)
+  enabled: true
+
   cache:
-    enabled: true # The option for PWA offline cache
-    # Paths defined here will be excluded from the PWA cache.
-    # Usually its value is the `baseurl` of another website that
-    # shares the same domain name as the current website.
+    enabled: true
+
     deny_paths:
-      # - "/example"  # URLs match `<SITE_URL>/example/*` will not be cached by the PWA
+      # - "/example"
 
-paginate: 10
+# ---------------------------------------------------------
+# Pagination
+# ---------------------------------------------------------
 
-# The base URL of your site
-baseurl: ""
+paginate: 8
 
-# ------------ The following options are not recommended to be modified ------------------
+# =========================================================
+# 아래 설정은 테마의 기본 동작을 위한 영역
+# 특별한 이유가 없다면 수정하지 않는 것을 권장
+# =========================================================
 
 kramdown:
   footnote_backlink: "&#8617;&#xfe0e;"
   syntax_highlighter: rouge
-  syntax_highlighter_opts: # Rouge Options › https://github.com/jneen/rouge#full-options
+
+  syntax_highlighter_opts:
     css_class: highlight
-    # default_lang: console
+
     span:
       line_numbers: false
+
     block:
       line_numbers: true
       start_line: 1
@@ -184,22 +197,22 @@ collections:
 
 defaults:
   - scope:
-      path: "" # An empty string here means all files in the project
+      path: ""
       type: posts
     values:
       layout: post
-      comments: true # Enable comments in posts.
-      toc: true # Display TOC column in posts.
-      # DO NOT modify the following parameter unless you are confident enough
-      # to update the code of all other post links in this project.
+      comments: false
+      toc: true
       permalink: /posts/:title/
+
   - scope:
       path: _drafts
     values:
       comments: false
+
   - scope:
       path: ""
-      type: tabs # see `site.collections`
+      type: tabs
     values:
       layout: page
       permalink: /:title/
@@ -213,6 +226,7 @@ compress_html:
   endings: all
   profile: false
   blanklines: false
+
   ignore:
     envs: [development]
 
@@ -229,9 +243,11 @@ exclude:
 
 jekyll-archives:
   enabled: [categories, tags]
+
   layouts:
     category: category
     tag: tag
+
   permalinks:
     tag: /tags/:name/
     category: /categories/:name/

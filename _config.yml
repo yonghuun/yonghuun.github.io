@@ -33,24 +33,15 @@ baseurl: ""
 github:
   username: yonghuun
 
-twitter:
-  username:
-
 social:
   name: 고용훈
 
-  # 실제 공개할 이메일이 정해지면 입력
-  # 예: email: example@gmail.com
-  email:
-
-  fediverse_handle:
+  # 실제 공개할 이메일이 정해지면 다음 줄의 주석을 해제해 입력하세요.
+  # email: name@example.com
 
   links:
     - https://github.com/yonghuun
 
-    # LinkedIn 또는 다른 포트폴리오가 생기면 아래처럼 추가
-    # - https://www.linkedin.com/in/사용자명
-    # - https://velog.io/@사용자명
 
 # ---------------------------------------------------------
 # Search Engine Verification

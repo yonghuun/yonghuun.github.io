@@ -5,7 +5,7 @@ order: 2
 ---
 
 <div class="portfolio-project-grid">
-  <article class="portfolio-project-card portfolio-project-card--featured">
+  <article id="tripcrew" class="portfolio-project-card portfolio-project-card--featured" tabindex="-1">
     <div class="portfolio-card-heading">
       <div><p class="portfolio-eyebrow">BACKEND · TRAVEL PLATFORM</p><h2>TripCrew</h2></div>
       <span class="portfolio-status">Backend Developer</span>
@@ -32,7 +32,7 @@ order: 2
     </div>
   </article>
 
-  <article class="portfolio-project-card">
+  <article id="yacht-dice" class="portfolio-project-card" tabindex="-1">
     <div class="portfolio-card-heading">
       <div><p class="portfolio-eyebrow">REALTIME GAME</p><h2>WebRTC 요트다이스</h2></div>
       <span class="portfolio-status portfolio-status--progress">개발 진행 중</span>
@@ -50,7 +50,7 @@ order: 2
     <div class="portfolio-actions"><a class="portfolio-button" href="/posts/game-timer-deadline/">타이머 설계 글</a></div>
   </article>
 
-  <article class="portfolio-project-card">
+  <article id="mallang-order" class="portfolio-project-card" tabindex="-1">
     <p class="portfolio-eyebrow">AI VOICE KIOSK</p>
     <h2>말랑오더</h2>
     <p>음성으로 탐색, 주문, 결제를 지원하는 AI 음성 주문 키오스크</p>
@@ -63,7 +63,7 @@ order: 2
     <p class="portfolio-tech-list">Java · Spring Boot · MyBatis · React · TypeScript · Figma</p>
   </article>
 
-  <article class="portfolio-project-card">
+  <article id="11job" class="portfolio-project-card" tabindex="-1">
     <p class="portfolio-eyebrow">CAREER MANAGEMENT</p>
     <h2>11JOB</h2>
     <p>구직 활동과 포트폴리오 자료를 관리하는 서비스</p>

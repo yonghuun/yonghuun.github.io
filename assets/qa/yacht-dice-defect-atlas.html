@@ -1,0 +1,991 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>결함 부검 카탈로그 — 요트 다이스 QA 36건</title>
+<meta name="description" content="실시간 멀티플레이 게임 QA에서 나온 결함 36건을 패턴·증상·시간 세 렌즈로 재배열한 카탈로그">
+</head>
+<body>
+<style>
+  :root {
+    --paper: #f6f4f2;
+    --panel: #fffefd;
+    --sunken: #efebe8;
+    --ink: #171514;
+    --ink-soft: #56504c;
+    --ink-faint: #8a827c;
+    --rule: rgb(23 21 20 / 12%);
+    --rule-soft: rgb(23 21 20 / 7%);
+    --accent: #c9302c;
+    --accent-tint: rgb(201 48 44 / 9%);
+    --sev-crit: #c03a34;
+    --sev-high: #a8791d;
+    --sev-mid: #4f7695;
+    --sev-note: #7b756f;
+    --ok: #4c7a55;
+
+    --mono: ui-monospace, "Cascadia Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    --sans: "Pretendard", "Apple SD Gothic Neo", "Segoe UI", "Malgun Gothic", system-ui, sans-serif;
+
+    --gutter: 5.5rem;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #0b0c0d;
+      --panel: #131416;
+      --sunken: #191b1d;
+      --ink: #f2f0ee;
+      --ink-soft: #a8a29d;
+      --ink-faint: #756f6a;
+      --rule: rgb(255 255 255 / 13%);
+      --rule-soft: rgb(255 255 255 / 7%);
+      --accent: #ff5d57;
+      --accent-tint: rgb(255 93 87 / 13%);
+      --sev-crit: #ff6b66;
+      --sev-high: #e9b44c;
+      --sev-mid: #7fa9cd;
+      --sev-note: #8e8880;
+      --ok: #8fcb9b;
+    }
+  }
+  :root[data-theme="light"] {
+    --paper: #f6f4f2; --panel: #fffefd; --sunken: #efebe8;
+    --ink: #171514; --ink-soft: #56504c; --ink-faint: #8a827c;
+    --rule: rgb(23 21 20 / 12%); --rule-soft: rgb(23 21 20 / 7%);
+    --accent: #c9302c; --accent-tint: rgb(201 48 44 / 9%);
+    --sev-crit: #c03a34; --sev-high: #a8791d; --sev-mid: #4f7695; --sev-note: #7b756f; --ok: #4c7a55;
+  }
+  :root[data-theme="dark"] {
+    --paper: #0b0c0d; --panel: #131416; --sunken: #191b1d;
+    --ink: #f2f0ee; --ink-soft: #a8a29d; --ink-faint: #756f6a;
+    --rule: rgb(255 255 255 / 13%); --rule-soft: rgb(255 255 255 / 7%);
+    --accent: #ff5d57; --accent-tint: rgb(255 93 87 / 13%);
+    --sev-crit: #ff6b66; --sev-high: #e9b44c; --sev-mid: #7fa9cd; --sev-note: #8e8880; --ok: #8fcb9b;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 62rem; margin: 0 auto; padding: 0 1.5rem 6rem; }
+
+  /* ---------- masthead ---------- */
+
+  .masthead { padding: 3.5rem 0 2rem; border-bottom: 1px solid var(--ink); }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 1rem;
+  }
+  h1 {
+    font-size: clamp(2rem, 6vw, 3.25rem);
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin: 0 0 0.75rem;
+    text-wrap: balance;
+  }
+  .standfirst {
+    max-width: 46ch;
+    color: var(--ink-soft);
+    font-size: 1.0625rem;
+    margin: 0 0 1.75rem;
+  }
+  .credits {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--ink-faint);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1.25rem;
+  }
+
+  /* ---------- stats ---------- */
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+    border-bottom: 1px solid var(--rule);
+  }
+  .stat { padding: 1.25rem 1.25rem 1.35rem 0; }
+  .stat + .stat { border-left: 1px solid var(--rule-soft); padding-left: 1.25rem; }
+  .stat b {
+    display: block;
+    font-family: var(--mono);
+    font-size: 1.75rem;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+  .stat span {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--ink-faint);
+    margin-top: 0.35rem;
+    letter-spacing: 0.01em;
+  }
+  .stat.is-alert b { color: var(--sev-crit); }
+
+  .thesis {
+    margin: 2.5rem 0 0;
+    padding: 1.5rem 0 1.5rem 1.5rem;
+    border-left: 3px solid var(--accent);
+    font-size: clamp(1.125rem, 2.6vw, 1.45rem);
+    line-height: 1.45;
+    letter-spacing: -0.012em;
+    text-wrap: balance;
+    max-width: 40ch;
+  }
+  .thesis em { font-style: normal; color: var(--accent); }
+
+  /* ---------- lens nav ---------- */
+
+  .lens-nav {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    gap: 0;
+    margin-top: 3rem;
+    background: var(--paper);
+    border-bottom: 1px solid var(--ink);
+    overflow-x: auto;
+  }
+  .lens-btn {
+    appearance: none;
+    background: none;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    padding: 0.85rem 1.1rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .lens-btn:hover { color: var(--ink); }
+  .lens-btn[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+  .lens-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+  .lens { padding-top: 2.5rem; }
+  .lens[hidden] { display: none; }
+
+  h2 {
+    font-size: 1.375rem;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+    margin: 0 0 0.4rem;
+  }
+  .section-note { color: var(--ink-soft); max-width: 58ch; margin: 0 0 2rem; font-size: 0.9375rem; }
+
+  /* ---------- filters ---------- */
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.9rem 0;
+    margin-bottom: 1.5rem;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .filters input[type="search"] {
+    flex: 1 1 12rem;
+    min-width: 0;
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 0.875rem;
+    padding: 0.5rem 0.7rem;
+    border-radius: 2px;
+  }
+  .filters input[type="search"]:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .chip {
+    appearance: none;
+    background: none;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    padding: 0.32rem 0.7rem;
+    font-family: var(--mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .chip:hover { border-color: var(--ink-faint); color: var(--ink); }
+  .chip[aria-pressed="true"] {
+    background: var(--accent-tint);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .result-count {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--ink-faint);
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- pattern blocks ---------- */
+
+  .pattern { margin-bottom: 3.25rem; }
+  .pattern[hidden] { display: none; }
+  .pattern-head {
+    display: grid;
+    grid-template-columns: var(--gutter) 1fr;
+    gap: 0 1.25rem;
+    align-items: start;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid var(--ink);
+  }
+  .pattern-code {
+    font-family: var(--mono);
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--accent);
+    line-height: 1.2;
+  }
+  .pattern-title { font-size: 1.1875rem; font-weight: 700; letter-spacing: -0.015em; margin: 0.15rem 0 0.5rem; }
+  .pattern-def { color: var(--ink-soft); margin: 0; max-width: 60ch; font-size: 0.9375rem; }
+  .pattern-rule {
+    margin: 0.85rem 0 0;
+    padding: 0.6rem 0.85rem;
+    background: var(--sunken);
+    border-left: 2px solid var(--ok);
+    font-size: 0.875rem;
+    max-width: 60ch;
+  }
+  .pattern-rule b { color: var(--ok); font-weight: 700; }
+
+  /* ---------- case rows ---------- */
+
+  .case { border-bottom: 1px solid var(--rule-soft); }
+  .case[hidden] { display: none; }
+  .case > summary {
+    display: grid;
+    grid-template-columns: var(--gutter) 1fr auto;
+    gap: 0 1.25rem;
+    align-items: baseline;
+    padding: 0.95rem 0;
+    cursor: pointer;
+    list-style: none;
+  }
+  .case > summary::-webkit-details-marker { display: none; }
+  .case > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .case-id {
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+    color: var(--ink-faint);
+    letter-spacing: 0.04em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .tick { width: 3px; height: 0.95rem; background: var(--sev-note); display: inline-block; }
+  .sev-crit .tick { background: var(--sev-crit); }
+  .sev-high .tick { background: var(--sev-high); }
+  .sev-mid  .tick { background: var(--sev-mid); }
+  .case-title { font-weight: 600; letter-spacing: -0.01em; }
+  .case:hover .case-title { color: var(--accent); }
+  .case-meta {
+    font-family: var(--mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    white-space: nowrap;
+  }
+  .sev-crit .case-meta em { color: var(--sev-crit); font-style: normal; }
+  .sev-high .case-meta em { color: var(--sev-high); font-style: normal; }
+  .sev-mid  .case-meta em { color: var(--sev-mid);  font-style: normal; }
+  .sev-note .case-meta em { color: var(--sev-note); font-style: normal; }
+
+  .case-body {
+    display: grid;
+    grid-template-columns: var(--gutter) 1fr;
+    gap: 0.75rem 1.25rem;
+    padding: 0.35rem 0 1.5rem;
+  }
+  .case-body dt {
+    font-family: var(--mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    padding-top: 0.2rem;
+  }
+  .case-body dd { margin: 0; max-width: 62ch; color: var(--ink); }
+  .case-body dd.muted { color: var(--ink-soft); }
+  .case-body code {
+    font-family: var(--mono);
+    font-size: 0.85em;
+    background: var(--sunken);
+    padding: 0.1em 0.35em;
+    border-radius: 2px;
+  }
+
+  /* ---------- diagnostic table ---------- */
+
+  .table-scroll { overflow-x: auto; border-top: 1px solid var(--ink); }
+  table { border-collapse: collapse; width: 100%; min-width: 40rem; }
+  th, td { text-align: left; vertical-align: top; padding: 0.8rem 1rem 0.8rem 0; border-bottom: 1px solid var(--rule-soft); }
+  th {
+    font-family: var(--mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 500;
+    padding-top: 0.7rem;
+  }
+  td.symptom { font-weight: 600; width: 34%; }
+  td .ref { font-family: var(--mono); font-size: 0.75rem; color: var(--accent); }
+  td.how { color: var(--ink-soft); font-size: 0.875rem; }
+
+  /* ---------- timeline ---------- */
+
+  .tl { border-left: 1px solid var(--rule); margin-left: 0.4rem; padding-left: 0; }
+  .tl-item { position: relative; padding: 0 0 2rem 1.75rem; }
+  .tl-item::before {
+    content: "";
+    position: absolute;
+    left: -4.5px;
+    top: 0.55rem;
+    width: 8px; height: 8px;
+    background: var(--paper);
+    border: 1.5px solid var(--ink-faint);
+    border-radius: 50%;
+  }
+  .tl-item.hot::before { border-color: var(--accent); background: var(--accent); }
+  .tl-date {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+  }
+  .tl-title { font-weight: 700; margin: 0.1rem 0 0.35rem; letter-spacing: -0.01em; }
+  .tl-body { color: var(--ink-soft); margin: 0; max-width: 60ch; font-size: 0.9375rem; }
+  .tl-body strong { color: var(--ink); font-weight: 600; }
+
+  /* ---------- debt / rules ---------- */
+
+  .closing { margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--ink); }
+  .two-col { display: grid; grid-template-columns: 1fr; gap: 3rem; }
+  @media (min-width: 52rem) { .two-col { grid-template-columns: 1.15fr 1fr; gap: 3.5rem; } }
+
+  .debt { list-style: none; margin: 0; padding: 0; }
+  .debt li { display: grid; grid-template-columns: 2.75rem 1fr; gap: 0 0.75rem; padding: 0.85rem 0; border-bottom: 1px solid var(--rule-soft); }
+  .debt .code { font-family: var(--mono); font-size: 0.8125rem; color: var(--accent); padding-top: 0.15rem; }
+  .debt b { display: block; font-weight: 600; }
+  .debt span { color: var(--ink-soft); font-size: 0.875rem; }
+
+  .rules { list-style: none; counter-reset: r; margin: 0; padding: 0; }
+  .rules li {
+    counter-increment: r;
+    display: grid;
+    grid-template-columns: 1.75rem 1fr;
+    gap: 0 0.6rem;
+    padding: 0.6rem 0;
+    font-size: 0.9375rem;
+  }
+  .rules li::before {
+    content: counter(r, decimal-leading-zero);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--ink-faint);
+    padding-top: 0.22rem;
+  }
+  .rules .kind {
+    font-family: var(--mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+  }
+
+  .fnd-table td.symptom { width: 26%; }
+
+  footer.colophon {
+    margin-top: 4rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--rule);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--ink-faint);
+    line-height: 1.8;
+  }
+
+  @media (max-width: 40rem) {
+    :root { --gutter: 3.5rem; }
+    .case > summary { grid-template-columns: var(--gutter) 1fr; }
+    .case-meta { grid-column: 2; }
+    .pattern-head, .case-body { grid-template-columns: 1fr; gap: 0.5rem; }
+    .case-body dt { padding-top: 0.6rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">요트 다이스 · 팀 프로젝트 QA · 2026-07-27 → 07-30</p>
+    <h1>결함 부검 카탈로그</h1>
+    <p class="standfirst">
+      QA에서 나온 36건을 "무엇을 고쳤나"가 아니라 <strong>"왜 그 버그가 태어났나"</strong>로 다시 배열했다.
+      패턴 · 증상 · 시간, 세 개의 렌즈로 같은 사건을 본다.
+    </p>
+    <p class="credits">
+      <span>근거: 커밋 이력 · QA 실측 기록 · 코드 실물</span>
+      <span>구간: develop 커밋 171개</span>
+    </p>
+  </header>
+
+  <section class="stats" aria-label="요약 지표">
+    <div class="stat"><b>36</b><span>정리한 사례</span></div>
+    <div class="stat"><b>8</b><span>결함 패턴</span></div>
+    <div class="stat is-alert"><b>10</b><span>치명 등급</span></div>
+    <div class="stat"><b>13 → 5</b><span>백엔드 테스트 실패</span></div>
+    <div class="stat"><b>5</b><span>남은 부채</span></div>
+  </section>
+
+  <p class="thesis">
+    버그 대부분은 코드를 잘못 짜서가 아니라,<br>
+    <em>같은 사실에 대한 답이 두 군데 있어서</em> 생겼다.
+  </p>
+
+  <nav class="lens-nav" role="tablist" aria-label="보기 전환">
+    <button class="lens-btn" role="tab" id="tab-pattern" aria-controls="lens-pattern" aria-selected="true">① 패턴 지도</button>
+    <button class="lens-btn" role="tab" id="tab-symptom" aria-controls="lens-symptom" aria-selected="false">② 증상 진단표</button>
+    <button class="lens-btn" role="tab" id="tab-time" aria-controls="lens-time" aria-selected="false">③ 타임라인</button>
+  </nav>
+
+  <!-- ============ LENS 1 ============ -->
+  <section class="lens" id="lens-pattern" role="tabpanel" aria-labelledby="tab-pattern">
+    <h2>반복된 실수의 지도</h2>
+    <p class="section-note">
+      개별 사건을 세는 대신 원인의 <strong>모양</strong>으로 묶었다. 같은 모양은 같은 규칙 하나로 막을 수 있기 때문이다.
+      각 사례를 펼치면 증상 → 진짜 원인 → 처방을 볼 수 있다.
+    </p>
+
+    <div class="filters">
+      <input type="search" id="q" placeholder="증상·원인·커밋 해시 검색" aria-label="사례 검색">
+      <button class="chip" data-sev="crit" aria-pressed="false">치명</button>
+      <button class="chip" data-sev="high" aria-pressed="false">높음</button>
+      <button class="chip" data-sev="mid" aria-pressed="false">중간</button>
+      <button class="chip" data-layer="BE" aria-pressed="false">백엔드</button>
+      <button class="chip" data-layer="FE" aria-pressed="false">프론트</button>
+      <button class="chip" data-layer="INFRA" aria-pressed="false">인프라</button>
+      <span class="result-count" id="count" aria-live="polite"></span>
+    </div>
+
+    <div id="patterns"></div>
+  </section>
+
+  <!-- ============ LENS 2 ============ -->
+  <section class="lens" id="lens-symptom" role="tabpanel" aria-labelledby="tab-symptom" hidden>
+    <h2>증상 → 용의자</h2>
+    <p class="section-note">
+      QA 중 증상만 손에 쥐고 있을 때 쓰는 표. 위에서부터 확률순으로 의심하면 된다.
+    </p>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th scope="col">눈에 보이는 증상</th><th scope="col">1순위 용의자</th><th scope="col">2순위</th><th scope="col">확인 방법</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="symptom">404 “존재하지 않는 방”인데 남들은 게임 중</td><td>유령 방 — Redis 키만 만료 <span class="ref">C07</span></td><td>부팅 시 전체 삭제 <span class="ref">C19</span></td><td class="how">redis-cli TTL room:{code}</td></tr>
+          <tr><td class="symptom">에러가 “API request failed with status 404”</td><td>404 본문 없음 <span class="ref">C14</span></td><td>—</td><td class="how">응답 body 확인</td></tr>
+          <tr><td class="symptom">호스트만 게임 화면으로 넘어감</td><td>state.sync 미방송 <span class="ref">C13</span></td><td>phase 고정 반환</td><td class="how">WS 프레임 로그</td></tr>
+          <tr><td class="symptom">굴리기가 서버에 거부됨</td><td>굴림 횟수 권위 이중화 <span class="ref">C01</span></td><td>굴림 순서 검증 <span class="ref">C27</span></td><td class="how">서버 activeRollCount ↔ 클라 값</td></tr>
+          <tr><td class="symptom">새로고침 후 주사위·KEEP이 사라짐</td><td>스냅샷에 굴림 진행 없음 <span class="ref">C01</span></td><td>—</td><td class="how">GameState 페이로드</td></tr>
+          <tr><td class="symptom">멈춘 주사위의 눈이 잠깐 다름</td><td>예측 재시뮬레이션 드리프트 <span class="ref">C10</span></td><td>—</td><td class="how">멈춘 뒤 값이 바뀌는지</td></tr>
+          <tr><td class="symptom">상대 화면의 KEEP이 다름</td><td>KEEP 전파 없음 <span class="ref">C04</span></td><td>관전 연출 비동기 <span class="ref">C17</span></td><td class="how">dice.hold_changed 수신</td></tr>
+          <tr><td class="symptom">“닉네임이 올바르지 않습니다”인데 닉네임은 멀쩡</td><td>세션 만료가 같은 예외로 뭉개짐 <span class="ref">C08</span></td><td>—</td><td class="how">서버 예외 타입</td></tr>
+          <tr><td class="symptom">대기실에서 아무 반응 없이 갇힘</td><td>세션 만료 코드 미구분 <span class="ref">C08</span></td><td>유령 방 <span class="ref">C02</span></td><td class="how">클라 FSM 상태</td></tr>
+          <tr><td class="symptom">잠깐 자리 비웠더니 게임이 없어짐</td><td>유예 30초 공유 <span class="ref">C06</span></td><td>TTL 고정 <span class="ref">C07</span></td><td class="how">이탈~복귀 경과 시간</td></tr>
+          <tr><td class="symptom">배포 직후 모든 방이 사라짐</td><td>부팅 시 room:* 전체 삭제 <span class="ref">C19</span></td><td>—</td><td class="how">초기화 로그</td></tr>
+          <tr><td class="symptom">12라운드가 끝나도 결과로 안 넘어감</td><td>종료 방송 누락 <span class="ref">C15</span></td><td>판정 경합 <span class="ref">C28</span></td><td class="how">game.over · state.sync 수신</td></tr>
+          <tr><td class="symptom">한 명 때문에 매 턴 25초씩 멈춤</td><td>오프라인 턴 미스킵 <span class="ref">C29</span></td><td>—</td><td class="how">registry 온라인 여부</td></tr>
+          <tr><td class="symptom">아이폰에서만 안 됨</td><td>플랫폼 규약 차이 <span class="ref">C22 · C23</span></td><td>—</td><td class="how">다른 브라우저와 대조</td></tr>
+          <tr><td class="symptom">모바일에서 화면이 좌우·상하로 밀림</td><td>Grid min-width:auto <span class="ref">C24</span></td><td>min-h-dvh <span class="ref">C25</span></td><td class="how">scrollWidth / scrollHeight 실측</td></tr>
+          <tr><td class="symptom">테스트는 빨간데 코드는 멀쩡</td><td>mock 경계 오단언 <span class="ref">C31</span></td><td>전제 누락 <span class="ref">C32</span></td><td class="how">실제 구현의 호출 경로 추적</td></tr>
+          <tr><td class="symptom">로컬에서만 WS가 안 붙음</td><td>vite에 /ws 프록시 없음 <span class="ref">E1</span></td><td>—</td><td class="how">VITE_WS_URL 값</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 style="margin-top:3.5rem">도구가 범인이었던 것들</h2>
+    <p class="section-note">버그가 아니라 QA 환경 문제였던 8건. 미리 알았다면 시간의 상당 부분을 아꼈다.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th scope="col">함정</th><th scope="col">실체</th><th scope="col">대응</th></tr></thead>
+        <tbody>
+          <tr><td class="symptom"><span class="ref">E1</span> WS 프록시 부재</td><td>.env.local은 상대경로인데 vite 프록시엔 /api만 있다 → WS가 5173으로 붙어 연결 실패</td><td class="how">로컬은 ws://localhost:8080/ws/v1/game 절대경로</td></tr>
+          <tr><td class="symptom"><span class="ref">E2</span> MSW off = 반쪽 상태</td><td>REST는 원격, WS는 localhost를 보는 상태</td><td class="how">VITE_API_TARGET 분리</td></tr>
+          <tr><td class="symptom"><span class="ref">E3</span> 절대 URL이 vitest를 깬다</td><td>vitest도 같은 .env를 읽어 MSW가 요청을 못 가로챈다</td><td class="how">상대경로 유지 + dev 프록시</td></tr>
+          <tr><td class="symptom"><span class="ref">E4</span> 자동화에서 rAF/WebGL 미동작</td><td>Browser pane 미표시 상태에서 물리 굴림이 완료되지 않음</td><td class="how">vitest mock + 콘솔에서 WS 메시지 직접 주입</td></tr>
+          <tr><td class="symptom"><span class="ref">E5</span> 모바일 프리셋 좌표 클릭 무시</td><td>같은 좌표를 element.click()으로는 정상 동작</td><td class="how">모바일 폭에서는 JS dispatch 우선</td></tr>
+          <tr><td class="symptom"><span class="ref">E6</span> 리사이즈 직후 스냅샷 오독</td><td>1280px인데 narrow로 보인 순간 포착 → 재검증 시 재현 안 됨</td><td class="how">앱 버그로 올리기 전 반드시 재검증</td></tr>
+          <tr><td class="symptom"><span class="ref">E7</span> Docker 미기동</td><td>통합 5건 미실행, 새 TOUCH Lua가 실제 Redis에서 미검증</td><td class="how">docker compose up -d 후 gradlew test</td></tr>
+          <tr><td class="symptom"><span class="ref">E8</span> iOS는 HTTPS 없이 시작조차 못 함</td><td>보안 컨텍스트가 아니면 devicemotion 자체가 차단</td><td class="how">터널 + vite allowed hosts</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ LENS 3 ============ -->
+  <section class="lens" id="lens-time" role="tabpanel" aria-labelledby="tab-time" hidden>
+    <h2>QA 라운드별로 무엇이 드러났나</h2>
+    <p class="section-note">
+      나흘 동안 QA의 초점이 <strong>계약 → 게임 루프 → 이탈·생명주기 → 화면 완성도</strong> 순으로 이동했다.
+      마지막 이틀에 치명 등급이 몰려 있는 건 그때 처음으로 <em>둘 이상이 실제로 같이 플레이</em>했기 때문이다.
+    </p>
+
+    <div class="tl">
+      <div class="tl-item">
+        <div class="tl-date">07-27 · API 통합 1차</div>
+        <p class="tl-title">서로 말이 통하게 만드는 단계</p>
+        <p class="tl-body">CORS 도메인, rooms API 연동과 대기실 이동. 아직 게임 로직이 아니라 <strong>계약을 맞추는</strong> 시기.</p>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">07-28 · 계약·배포 정비</div>
+        <p class="tl-title">권위가 갈리기 시작한다</p>
+        <p class="tl-body">OpenAPI 정합, Vercel SPA fallback, 게임 시작 미방송(C13), 재연결 게스트 ID(C05), 서버 주사위 생성(C03), 마감 점수 유실 1차(C27).</p>
+      </div>
+      <div class="tl-item hot">
+        <div class="tl-date">07-29 · 게임 루프 QA</div>
+        <p class="tl-title">한 판을 끝까지 돌려보니 쏟아졌다</p>
+        <p class="tl-body">12라운드 종료(C15), 세션 만료 코드(C08), 주사위 표시 면(C10), iOS 던지기(C22), KEEP 공유(C04), 빈 방 정리(C18), 마감 자동 굴림(C26). <strong>“끝까지 한 번 해본다”가 가장 많은 버그를 잡은 방법이었다.</strong></p>
+      </div>
+      <div class="tl-item hot">
+        <div class="tl-date">07-30 오전 · 오프라인·이탈 QA</div>
+        <p class="tl-title">여기서 CI가 조용히 멈췄다</p>
+        <p class="tl-body">오프라인 턴 스킵·2턴 자동 퇴장·명시적 퇴장(C21·C29)을 넣으면서 <strong>RoundTimerService 생성자가 늘었고, 테스트가 컴파일조차 되지 않게 됐다</strong>(C30). 그 뒤 이틀간 백엔드는 검증 없이 굴러갔다.</p>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">07-30 낮 · 프론트 자동 QA 1차</div>
+        <p class="tl-title">시나리오 8종 전수</p>
+        <p class="tl-body">랜딩·초대·닉네임·방 생성·코어 루프·세션 복원·오류 경로·모바일. 핵심 흐름은 전부 통과, FND-1~4 발견.</p>
+      </div>
+      <div class="tl-item hot">
+        <div class="tl-date">07-30 낮 · 사용자 제보 QA 2차</div>
+        <p class="tl-title">사람이 직접 해보니 다른 게 보였다</p>
+        <p class="tl-body">제보 6건을 라이브 재검증해 FND-5~9 확정. 자동 시나리오가 못 잡은 것들이 <strong>“관전 중”·“6명 꽉 찬 방”처럼 혼자서는 만들기 어려운 상태</strong>에 몰려 있었다.</p>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">07-30 오후 · 후속 구현</div>
+        <p class="tl-title">남겨둔 것 전부 처리</p>
+        <p class="tl-body">FND-6 결과 화면, FND-7 연출 a·b·c 전부, mock 픽스처 한계 2건 해소.</p>
+      </div>
+      <div class="tl-item hot">
+        <div class="tl-date">07-30 저녁 · 굴림·방 생명주기</div>
+        <p class="tl-title">가장 깊은 두 건</p>
+        <p class="tl-body">rollCount 데싱크(C01) 병합. 방 생명주기 4종(C02·C06·C07·C19·C20)은 <strong>MR 대기 중</strong> — 네 커밋은 쪼개 병합하면 안 된다.</p>
+      </div>
+    </div>
+
+    <h2 style="margin-top:3rem">프론트 QA 발견사항 9건</h2>
+    <p class="section-note">MSW mock 모드 · Chromium 1280×720 / 375×812 실측.</p>
+    <div class="table-scroll">
+      <table class="fnd-table">
+        <thead><tr><th scope="col">ID</th><th scope="col">내용</th><th scope="col">분류</th><th scope="col">처리</th></tr></thead>
+        <tbody>
+          <tr><td class="symptom"><span class="ref">FND-1</span></td><td>안내 “2~12자” vs 실제 1자 허용</td><td>문구</td><td class="how">문구만 통일 — 검증 규칙은 기획 결정이라 안 건드림</td></tr>
+          <tr><td class="symptom"><span class="ref">FND-2</span></td><td>초대 코드 힌트 “4자” vs 실제 4~12자</td><td>문구</td><td class="how">힌트 수정</td></tr>
+          <tr><td class="symptom"><span class="ref">FND-3</span></td><td>제출 직후 헤더가 “내 턴이에요” 유지</td><td>전이 상태</td><td class="how">isMyTurn &amp;&amp; !submitted 분기 + 회귀 테스트</td></tr>
+          <tr><td class="symptom"><span class="ref">FND-4</span></td><td>모바일 대기실 가로 스크롤 (425 &gt; 375)</td><td>실제 버그</td><td class="how">min-w-0 + clamp() 폰트 — C24</td></tr>
+          <tr><td class="symptom"><span class="ref">FND-5</span></td><td>상대 턴이 끝나도 점수시트가 안 닫힘</td><td>실제 버그</td><td class="how">여는 코드에 <strong>닫는 짝이 없었다</strong> → 턴 변경 이펙트에 추가</td></tr>
+          <tr><td class="symptom"><span class="ref">FND-6</span></td><td>대기실·결과 세로 스크롤 (942 &gt; 812)</td><td>실제 버그</td><td class="how">h-svh 프레임 + 목록만 내부 스크롤 — C25</td></tr>
+          <tr><td class="symptom"><span class="ref">FND-7</span></td><td>턴 전환 시각 신호가 약함</td><td>신규 UX</td><td class="how">1차는 보수적 기본안만, 방향 확인 후 a·b·c 전부 구현</td></tr>
+          <tr><td class="symptom"><span class="ref">FND-8</span></td><td>화면마다 카드 폭 기준이 다름 (512 / 672)</td><td>일관성</td><td class="how">근거가 코드에 없어서 max-w-2xl로 통일</td></tr>
+          <tr><td class="symptom"><span class="ref">FND-9</span></td><td>“참가자이 굴리는 중” 조사 오류</td><td>덤 발견</td><td class="how">받침 판정 대신 “(이)가” 표기 관례</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ CLOSING ============ -->
+  <section class="closing">
+    <div class="two-col">
+      <div>
+        <h2>아직 안 고친 것</h2>
+        <p class="section-note">권하는 순서는 D1 → D3. D3은 C19·C20을 근본적으로 불필요하게 만든다. 보안 관련 1건은 공개본에서 제외했다.</p>
+        <ul class="debt">
+          <li><span class="code">D1</span><div><b>RoomController의 catch-all → 404</b><span>모든 IllegalArgumentException이 “방 없음”으로 위장돼 디버깅이 막힌다. NumberFormatException까지 404가 된다.</span></div></li>
+          <li><span class="code">D3</span><div><b>RoundState가 인메모리</b><span>재시작하면 진행 중 게임 전부 유실. 포트가 이미 분리돼 있어 Redis 어댑터만 추가하면 된다.</span></div></li>
+          <li><span class="code">D4</span><div><b>UserService.assignRoom의 Map.of NPE 가능</b><span>hostId가 null이면 500. 코드상 가능, 재현 미확인.</span></div></li>
+          <li><span class="code">D5</span><div><b>JOIN Lua의 return 4 미처리</b><span>“이미 명단에 있음”이 성공으로 취급돼 카운터가 드리프트한다.</span></div></li>
+        </ul>
+        <p class="section-note" style="margin-top:1.5rem">
+          미검증으로 남은 것 — 실기기 재현 3종(이어하기 404 · 재접속 굴림 · 마감 자동 굴림), Docker 통합 테스트 5건, TOUCH Lua 실측.
+        </p>
+      </div>
+
+      <div>
+        <h2>버그에서 역산한 규칙 8</h2>
+        <p class="section-note">다음에 이 코드를 만질 때 알고 있어야 하는 것들.</p>
+        <ol class="rules">
+          <li><div><span class="kind">설계</span>턴 진행의 판단은 <code>advanceTurn</code> 한 곳에만 — 제출 경로와 마감 만료 경로가 같은 코드를 지나야 갈라지지 않는다.</div></li>
+          <li><div><span class="kind">설계</span>게임 종료는 <code>GameCompletionService</code> 한 곳. 순서가 중요하다: 타이머 정지 → phase CAS 전이 → 방송.</div></li>
+          <li><div><span class="kind">설계</span>굴림 횟수·주사위·KEEP의 권위는 서버. 클라는 받아 쓴다.</div></li>
+          <li><div><span class="kind">설계</span>방 존재의 권위는 Redis. WS도 이제 여기에 물어본다.</div></li>
+          <li><div><span class="kind">프로세스</span>CI에 백엔드 테스트를 게이트로 건다 — “실패 0건”과 “실행 0건”은 로그에서 똑같이 조용하다.</div></li>
+          <li><div><span class="kind">프로세스</span>main·develop에 직접 머지하지 않는다. 여기엔 기술적 방어책이 없다.</div></li>
+          <li><div><span class="kind">프로세스</span>레이아웃은 최소재현과 최악치 양쪽으로 실측한다(6자/12자, 2인/6인).</div></li>
+          <li><div><span class="kind">프로세스</span>고치지 않기로 한 것도 근거와 함께 남긴다 — 기획 결정과 구현 결정을 섞지 않는다.</div></li>
+        </ol>
+      </div>
+    </div>
+
+    <footer class="colophon">
+      <a href="/posts/yacht-dice-qa-troubleshooting/" style="color:var(--accent)">← 회고 글로 돌아가기</a><br>
+      사례 ID(C01–C36)와 패턴 코드(P1–P8)는 회고 글과 동일하게 쓴다. 보안 관련 1건은 공개본에서 제외했다.
+    </footer>
+  </section>
+</div>
+
+<script>
+const PATTERNS = [
+  { code: "P1", title: "권위 이중화", def: "클라와 서버가, 혹은 Redis와 인메모리가 같은 값을 각자 보관하고 각자 갱신한다. 한 번 어긋나면 스스로 복구할 경로가 없어 그 세션이 끝날 때까지 어긋난 채로 간다.",
+    rule: "값마다 주인을 한 명만 정하고 나머지는 받아 쓴다. 생성은 클라, 검증만 서버인 구조는 권위가 반쪽이라 반드시 어긋난다." },
+  { code: "P2", title: "손잡이 하나, 하는 일 둘", def: "상수 하나, 예외 타입 하나, 저장소 하나가 성격이 다른 두 요구를 동시에 만족시키려다 한쪽을 배신한다.",
+    rule: "“이 값을 바꾸면 누가 영향받나”를 세어 본다. 둘 이상이면 이미 쪼갤 때다." },
+  { code: "P3", title: "예측과 실제의 어긋남", def: "성능·연출을 위해 결과를 앞당겨 계산해 두는데, 실제 진행이 예측을 배신하면 화면만 거짓말을 한다.",
+    rule: "예측은 연출에만 쓰고, 확정 시점에는 반드시 실제 상태에서 다시 유도한다." },
+  { code: "P4", title: "계약의 구멍", def: "REST가 바꾼 상태를 소켓이 모르고, 에러 본문이 비어 클라의 코드 매핑이 걸리지 않는다. 서버는 정상이고 로그도 깨끗한데 화면만 멈춰 있다.",
+    rule: "상태를 바꾸는 모든 진입점에 “이 변경을 누가 알아야 하나”를 붙인다. 본문 없는 에러는 에러가 아니라 침묵이다." },
+  { code: "P5", title: "생명주기 회수 누락", def: "Redis TTL은 Redis만 청소한다. 서버 메모리·스케줄러 예약·명단은 아무도 안 치운다. 반대로 과잉 청소는 살아있는 방을 죽인다.",
+    rule: "자원마다 회수 경로를 두 개 둔다 — 빠른 경로(이벤트)와 느린 경로(주기 스윕). 이벤트만 있으면 재시작에 증발한다." },
+  { code: "P6", title: "플랫폼 기본값의 함정", def: "iOS의 가속도 부호, CSS Grid의 min-width:auto, min-h-dvh의 “최소”. 코드는 맞는데 플랫폼 규약이 우리 기대와 다르다.",
+    rule: "“왜 안 되지”가 아니라 “이 플랫폼에서 이 속성의 기본값이 뭐지”를 먼저 확인한다." },
+  { code: "P7", title: "서버가 끝을 책임지지 않음", def: "마감을 클라이언트에 맡겼다. 탭이 백그라운드면 안 오고, 브라우저가 죽으면 영영 안 온다. 게임은 그 자리에서 멈춘다.",
+    rule: "게임을 끝낼 수 있는 주체는 서버 하나뿐이어야 한다. 클라의 협조는 최적화지 조건이 아니다." },
+  { code: "P8", title: "검증 인프라의 맹점", def: "테스트가 돌지 않는 걸 아무도 몰랐다. 이번에 찾은 문제의 상당수가 여기서 파생됐다.",
+    rule: "CI에 백엔드 테스트를 게이트로 건다. “실패 0건”과 “실행 0건”은 로그에서 똑같이 조용하다." },
+];
+
+const CASES = [
+  // P1
+  { id:"C01", p:"P1", sev:"crit", layer:"BE", commit:"af7c7e8", t:"굴림 횟수를 클라와 서버가 각자 셌다",
+    symptom:"자기 턴인데 굴리기가 “rollCount must advance exactly once…”로 거부된다. 한 번 터지면 그 턴 내내 복구되지 않는다.",
+    cause:"클라가 값을 만들어 보내고 서버가 activeRollCount + 1인지 엄격히 검증하는데, <b>서버가 자기 카운트를 알려줄 경로가 없었다</b>. 어긋나는 길은 둘 — ① 재접속 스냅샷에 굴림 진행이 없어 클라가 0부터 다시 셈 ② 클라 카운트가 애니메이션 완료 시점에 올라가는데, 마감 자동 굴림이 진행 중인 굴림을 교체하면 이전 완료 콜백이 requestId 불일치로 버려져 증가분이 영구 증발.",
+    fix:"RoundState의 activeRollCount·activeDice·activeHeld를 재접속 스냅샷에 실어 보내고, 클라는 dice.broadcast의 값을 <b>그대로 대입</b>한다. round.start는 같은 턴에도 마감 연장으로 다시 오므로 <b>턴이 실제로 바뀌었을 때만</b> 초기화 — 무조건 0으로 되돌리면 ①이 되살아난다.",
+    note:"덤으로 “새로고침하면 주사위·KEEP이 사라져 점수를 못 넣는” 별건이 함께 해결됐다. 마감 자동 굴림 경로는 실기기 재현이 아직 미완." },
+  { id:"C02", p:"P1", sev:"crit", layer:"BE", commit:"dc9fda4", t:"방 존재의 권위가 Redis와 인메모리로 갈렸다",
+    symptom:"이어하기 404. 남은 사람은 계속 노는데 신규 참가만 실패하거나, 반대로 phase는 PLAYING인데 아무도 못 들어간다.",
+    cause:"REST는 Redis room:{code} 키를 보고 404를 내는데, <b>WS room.join은 아무것도 검사하지 않고 방을 만들었다</b>. 그래서 메모리엔 있고 Redis엔 없는 <b>유령 방</b>, Redis엔 있고 메모리엔 없는 <b>좀비 방</b>이 양방향으로 생긴다.",
+    fix:"WS도 Redis 방 존재를 확인하고 없으면 ROOM_NOT_FOUND로 거절한다. 클라는 그 코드로 세션을 정리해 홈으로 보낸다. “방 존재의 권위는 Redis”를 설계 원칙으로 못 박았다.",
+    note:"C06·C07과 함께 병합해야 한다. 유예만 늘리면 40분 TTL 벽에 막히고, 부팅 정리만 고치면 좀비 방이 되살아난다." },
+  { id:"C03", p:"P1", sev:"high", layer:"BE", commit:"f42e319", t:"주사위 눈을 클라가 만들고 있었다",
+    symptom:"내 화면과 상대 화면의 주사위가 다를 수 있고, 마감 시 점수가 유실됐다.",
+    cause:"굴림 결과 숫자의 생성 주체가 클라였다. 멀티플레이에서 결과값 생성은 서버만 할 수 있는 일이다.",
+    fix:"서버가 숫자를 생성해 dice.broadcast로 전원에게 뿌린다. 클라의 3D 물리는 <b>받은 값이 나오도록 연출하는</b> 역할로 축소됐다." },
+  { id:"C04", p:"P1", sev:"mid", layer:"BE", commit:"17e6aa4", t:"굴린 뒤 바꾼 KEEP이 전파되지 않았다",
+    symptom:"관전자 화면의 킵 표시가 실제와 다르다. 굴리지 않고 기록하면 끝까지 반영되지 않고, 마감 자동 굴림도 낡은 KEEP으로 굴린다.",
+    cause:"KEEP이 dice.roll 페이로드에만 실려 있었다. 전달되는 건 “그 굴림에 쓴 값”뿐이라, 굴린 뒤 바꾼 KEEP은 다음 굴림 전까지 아무도 모른다.",
+    fix:"dice.hold / dice.hold_changed를 신설해 토글 즉시 알린다. <b>증분이 아니라 전체 배열</b>을 보내므로 메시지 하나가 유실돼도 다음 토글에서 복구된다. dice.broadcast를 재사용하지 않은 건 그쪽이 굴림 애니메이션을 트리거하기 때문.",
+    note:"KEEP 변경은 마감 타이머를 갱신하지 않는다 — 토글로 턴을 무한히 늘릴 수 없어야 한다." },
+  { id:"C05", p:"P1", sev:"high", layer:"BE", commit:"9911384 · 5659ecf", t:"재연결하면 다른 사람이 됐다",
+    symptom:"재연결·브라우저 재시작 후 신규 게스트로 발급되고, 진행 중 방은 GAME_ALREADY_STARTED로 거부된다. 원래 자리는 offline으로 남아 있는데 매칭할 열쇠가 사라졌다.",
+    cause:"서버에 토큰 → userId 역인덱스가 아예 없어 resolveIdentity가 무조건 createGuest를 불렀고, 클라는 세션을 sessionStorage에만 뒀다.",
+    fix:"user:token:{hash} 역인덱스를 24h sliding TTL로 저장하고 authenticateSession()을 추가. 클라는 localStorage + {session, expiresAt} 봉투로 40분 sliding 만료.",
+    note:"자동 입장은 넣지 않았다 — 배너에서 “이어서 하기”를 눌러야 토큰을 제시한다. localStorage는 탭 간 공유라 “새 탭에서 이어하기 → 원래 탭 튕김”이 남는다(REPLACED_BY_NEW_SESSION)." },
+
+  // P2
+  { id:"C06", p:"P2", sev:"crit", layer:"BE", commit:"dc9fda4", t:"30초 유예를 대기실과 진행 중 게임이 공유했다",
+    symptom:"모바일에서 앱 전환·화면 잠금·전화 수신으로 30초를 넘기면 서버가 스스로 게임을 파괴한다.",
+    cause:"마지막 소켓이 끊기면 30초 뒤 방 전체(room·players·scores·game·scoreboard)를 삭제했다. 이 30초는 주석대로 <b>“새로고침 왕복”</b> 기준인데, 대기실과 진행 중 게임이 같은 값을 썼다. 재접속 복원 기능이 복원할 대상을 먼저 지우는 모순이었다.",
+    fix:"유예를 “잃을 것이 있는지”로 분리 — 빈 대기실 30초 유지, 진행 중 게임 10분.",
+    note:"판단 기준을 phase로 못 한 이유: registry.remove()가 마지막 참가자가 빠질 때 phase를 함께 버려서 그 시점엔 이미 WAITING으로 보인다. 그래서 <b>라운드 상태의 존재 여부</b>로 판단한다. 10분은 근거가 약한 값 — 이견 환영." },
+  { id:"C07", p:"P2", sev:"high", layer:"BE", commit:"7e59921", t:"방 TTL이 “생성 후 40분” 고정이었다",
+    symptom:"6인 × 12라운드처럼 긴 판에서 플레이 중인데 방이 사라진다.",
+    cause:"TTL의 의미가 “생성 시각 기준 절대 만료”라 활동과 무관했다.",
+    fix:"RoomService.touch()로 턴마다 TTL을 처음부터 다시 센다(sliding). 함께 만료돼야 하는 키를 같은 시각에 맞춰, 소멸 조건이 <b>“이 시간 동안 아무 활동이 없었다”</b> 한 문장이 된다.",
+    note:"새로 추가한 TOUCH Lua는 실제 Redis에서 아직 미검증(로컬 Docker 미기동)." },
+  { id:"C08", p:"P2", sev:"high", layer:"BE", commit:"a1a85f1", t:"세션 만료가 “닉네임이 올바르지 않습니다”로 나갔다",
+    symptom:"토큰이 만료된 사용자가 대기실에서 아무 안내 없이 갇힌다. 재연결도 돌지 않는다.",
+    cause:"토큰 만료·불일치와 닉네임 규칙 위반이 <b>같은 IllegalArgumentException</b>이라 전부 INVALID_MESSAGE로 나갔고, 클라는 그 코드를 세션 종료로 다루지 않는다.",
+    fix:"세션 실패만 SessionAuthenticationException으로 갈라 SESSION_EXPIRED로 알린다. IllegalArgumentException을 상속시켜 REST의 401 경로는 그대로 뒀다.",
+    note:"프론트에는 만료 안내 후 홈으로 보내는 복구 경로가 이미 있어서 프론트는 손대지 않았다. 예외 타입 하나가 두 실패를 대표하면 그 구분은 호출자 쪽에서 영영 복원할 수 없다." },
+  { id:"C09", p:"P2", sev:"mid", layer:"FE", commit:"5659ecf", t:"세션 저장소의 수명이 요구와 반대였다",
+    symptom:"브라우저를 껐다 켜면 복귀 배너가 뜨지 않는다.",
+    cause:"sessionStorage를 고른 원래 이유는 “장기 게스트 권한 잔존 방지”였는데, 목표(재시작 생존)와 정면 충돌했다.",
+    fix:"저장소는 localStorage로 바꾸되 원래 의도를 <b>클라이언트 만료</b>로 대체. 만료를 세션 계약에 섞지 않고 봉투로 감싸, 구버전 데이터는 검증 실패로 자연 폐기된다 — 마이그레이션 불필요." },
+
+  // P3
+  { id:"C10", p:"P3", sev:"high", layer:"FE", commit:"f16acd6", t:"멈춘 주사위가 틀린 눈을 보여줬다",
+    symptom:"바닥에 멈춘 주사위가 잘못된 눈을 보여주다가 결과 정렬 단계에서야 서버 값으로 바뀐다.",
+    cause:"주사위 눈은 물리 결과가 아니라 <b>쏟는 순간 월드를 복제해 미리 굴려 본 예측</b>을 근거로 회전 오프셋을 씌워 만든다. 복제 재시뮬레이션은 실제와 똑같이 재현되지 않고, 주사위 튐은 카오스적이라 작은 차이가 다른 면으로 증폭된다.",
+    fix:"멈춘 주사위는 예측을 믿지 않고 <b>실제 자세에서 오프셋을 다시 구한다</b>(멱등이라 매 프레임 호출해도 같다). 구르는 중인 주사위는 건드리지 않는다 — 매 프레임 맞추면 회전이 어색해진다. 예측 실패 시 지난 굴림의 보정이 남던 경로도 제거.",
+    note:"이번 QA에서 유일하게 정량 측정한 사례 — 수정 전 67회 중 2회 불일치 → 수정 후 138회 중 0회." },
+  { id:"C11", p:"P3", sev:"high", layer:"FE", commit:"af7c7e8", t:"카운터가 애니메이션을 기다렸다",
+    symptom:"자동 굴림이 진행 중인 굴림을 교체하면 굴림 횟수가 영구히 하나 모자란다.",
+    cause:"진행 상태를 “연출이 끝나면” 반영하는 구조라, 연출이 교체·취소되는 순간 <b>상태 갱신 자체가 사라진다</b>.",
+    fix:"상태는 브로드캐스트 수신 시점에 즉시 반영하고, 화면 표시만 settledRollCount로 기존 UX를 유지했다. 연출과 상태는 서로 다른 시계로 움직여야 한다." },
+  { id:"C12", p:"P3", sev:"note", layer:"FE", commit:"—", t:"mock의 점수 후보값이 실제 주사위와 무관했다",
+    symptom:"클라가 보여준 “라지 스트레이트 30”과 제출 후 mock 서버가 반영한 값(0)이 달랐다.",
+    cause:"픽스처가 정적이었다. <b>FE 버그가 아니다</b> — 서버 응답으로 클라 상태를 덮어쓰는 건 current-baseline.md의 명시된 정책이다.",
+    fix:"mock의 round.submit이 제출된 주사위로 domain/scoring을 실제로 돌려 소계·보너스·총점을 누적하게 바꿨다. 쓸모없어진 정적 픽스처는 삭제." },
+
+  // P4
+  { id:"C13", p:"P4", sev:"crit", layer:"BE", commit:"88ceb3d", t:"호스트만 게임 화면으로 넘어갔다",
+    symptom:"방장이 게임을 시작하면 방장만 게임 화면으로 가고 나머지는 대기실에 남는다.",
+    cause:"REST가 <b>Redis phase만 바꾸고 소켓으로는 아무것도 내보내지 않았다</b>. 응답을 직접 받는 호스트만 화면이 바뀐다. registry.snapshot은 WAITING을 고정 반환하고 있었다.",
+    fix:"registry에 방별 phase와 markPhase를 두고, 시작 성공 시 markPhase(PLAYING) → broadcastStateSync. 호출자가 없던 진입점을 실제로 연결했다.",
+    note:"이때 “방이 비면 phase도 버린다”를 함께 넣었는데, 그 결정이 나중에 C06의 “phase로 판단할 수 없다” 제약을 만든다 — 수정이 다음 수정의 전제를 바꾼 사례." },
+  { id:"C14", p:"P4", sev:"mid", layer:"BE", commit:"dc9fda4", t:"404 본문이 비어 날것의 문장이 노출됐다",
+    symptom:"사용자 화면에 “API request failed with status 404”가 그대로 보인다.",
+    cause:"프론트의 코드 매핑(textErrorPayload)은 본문이 있어야 걸리는데 본문이 비어 있었다.",
+    fix:"방 없음 404에 본문을 실어 보낸다. 본문 없는 에러는 에러가 아니라 침묵이다." },
+  { id:"C15", p:"P4", sev:"crit", layer:"BE", commit:"00c1955", t:"12라운드가 끝나도 결과 화면으로 안 넘어갔다",
+    symptom:"마지막 라운드가 끝나도 게임이 종료되지 않는다.",
+    cause:"종료 판정·전이·방송이 흩어져 있었고, phase(finished)는 <b>스냅샷으로만 전달</b>되는데 그 방송이 없으면 클라는 결과 화면으로 넘어갈 수 없다.",
+    fix:"GameCompletionService를 게임 종료의 단일 진입점으로 신설. 순서를 주석으로 못 박았다 — (1) 타이머 정지 → (2) phase CAS 전이 → (3) 방송. 라운드 상한 도달 시엔 점수판에 빈 칸이 있어도 종료하는 force 안전망을 뒀다.",
+    note:"RoundDeadlineScheduler를 직접 참조하는 건 순환 의존 회피용(RoundTimerService → GameCompletionService 방향만 유지)." },
+  { id:"C16", p:"P4", sev:"mid", layer:"BE", commit:"f8a2e4d · 2d75901", t:"REST 경로·인증 헤더가 OpenAPI 계약과 어긋났다",
+    symptom:"프론트 연동이 산발적으로 실패했다.",
+    cause:"경로·인증 헤더가 계약과 달랐고, 점수 확정이 REST에 남아 있었다.",
+    fix:"계약에 맞춰 정리하고 점수 확정을 WebSocket round.submit으로 전환. 방 생성~퇴장 REST 경로와 WS 점수 흐름을 검증하는 테스트를 함께 넣었다." },
+  { id:"C17", p:"P4", sev:"mid", layer:"FE", commit:"a860370 · a12615f", t:"관전 화면의 연출·하이라이트가 어긋났다",
+    symptom:"족보 연출이 관전자에게 어긋나게 뜨고, 상대 턴의 점수 하이라이트 위치가 틀렸다.",
+    cause:"관전 중 보이는 상태를 내 로컬 상태에서 유도했다.",
+    fix:"브로드캐스트에서 유도하도록 바꾸고, 근거가 불확실하던 추천 UI는 제거했다." },
+
+  // P5
+  { id:"C18", p:"P5", sev:"mid", layer:"BE", commit:"e759832", t:"아무도 없는 방이 Redis에 남았다",
+    symptom:"마지막 사람이 나가도 방 키가 TTL까지 남는다.",
+    cause:"퇴장 처리가 메모리 레지스트리만 정리했다.",
+    fix:"RoomCloseScheduler 포트와 인메모리 구현을 두고, 유예 후 Redis까지 정리한다. 통합 테스트 동반." },
+  { id:"C19", p:"P5", sev:"crit", layer:"BE", commit:"1035acd", t:"부팅할 때마다 살아있는 방이 전멸했다",
+    symptom:"배포하면 플레이 중인 방이 전부 사라진다.",
+    cause:"RoomCacheInitializer가 부팅 때 room:* 키를 <b>전부</b> 지웠다. 좀비 방을 막으려는 의도였지만, <b>피해 빈도가 압도적으로 큰 쪽을 막고 있지 않았다</b>.",
+    fix:"대상을 phase == PLAYING인 방으로 좁힌다. 부팅 직후엔 메모리에 라운드 상태가 있을 수 없으니 PLAYING = 이어갈 수 없는 방이고, 대기실·종료된 방은 라운드 상태 없이도 정상 동작한다. 의도가 드러나게 StaleRoomCleaner로 개명.",
+    note:"KEYS(O(N) 블로킹, 운영 Redis 금기) → SCAN으로 교체. 같은 클래스의 다른 경로는 이미 SCAN을 쓰고 있었다." },
+  { id:"C20", p:"P5", sev:"mid", layer:"BE", commit:"0f7c5de", t:"라운드 상태를 아무도 치우지 않았다",
+    symptom:"방이 사라진 뒤에도 서버 메모리에 라운드 상태가 남는다.",
+    cause:"<b>Redis TTL은 서버 메모리를 청소해주지 않는다.</b> 인메모리 자원의 회수 경로가 빈 방 유예 타이머 하나뿐이었고, 그 예약은 프로세스 재시작에 사라진다.",
+    fix:"5분마다 훑어 Redis에 방이 없는 항목을 회수한다. 유예 타이머는 “빠른 회수” 최적화로 남고, <b>정확성은 스윕이 받친다</b>.",
+    note:"keyspace notification은 설정 의존 + at-most-once라 쓰지 않았다. 한 항목이 수 KB 미만이라 동시 1000개도 수 MB." },
+  { id:"C21", p:"P5", sev:"high", layer:"BE", commit:"f53ca6a", t:"오프라인 플레이어가 방을 붙잡았다",
+    symptom:"돌아오지 않는 사람 때문에 게임이 계속 늘어진다.",
+    cause:"이탈을 확정할 경로가 없었다.",
+    fix:"오프라인으로 자기 턴을 2번째 맞으면 자동 퇴장. 이탈 확정의 <b>단일 경로</b>로 removePlayer를 만들어 명시적 나가기와 자동 퇴장을 모두 여기로 모았다 — 명단 제거 → player_left 방송 → 턴 순서 제거 순, <b>멱등</b>이라 REST 나가기와 소켓 종료가 연달아 와도 안전하다.",
+    note:"나가는 사람이 현재 턴 주인이면 만료 경로로 넘겨 라운드 완료·종료 판정을 한 곳에 유지한다. 마지막 한 명까지 나가면 라운드 상태와 타이머를 통째로 버린다." },
+
+  // P6
+  { id:"C22", p:"P6", sev:"high", layer:"FE", commit:"a46dcf7", t:"아이폰에서만 던지기가 인식되지 않았다",
+    symptom:"“통 안에서 흔들리기는 하는데 통을 나가지 않는다.” 세게 휘둘러도 소용없다.",
+    cause:"detectThrow가 전후 축의 <b>양수 방향만</b> 봤다. iOS Safari는 가속도 부호 규약이 Chrome과 반대라 앞으로 스냅하면 forward가 음수로 들어오고 peak·impulse·directionRatio가 전부 실패한다 — 통과가 구조적으로 불가능했다. 흔들기는 |horizontal|로 판정해서 멀쩡했기 때문에 증상이 저렇게 나타났다.",
+    fix:"전후 축을 절댓값으로 판정. 던지기의 본질은 “앞으로”가 아니라 <b>“한 축을 따라 날카롭게”</b>이고, 흔들기와의 구분은 부호가 아니라 축 우세 조건이 담당한다.",
+    note:"UA 분기나 부호 자동보정 대신 판정식 자체를 부호 무관하게 만든 것 — 기기·OS 버전 변화에 강하다." },
+  { id:"C23", p:"P6", sev:"mid", layer:"INFRA", commit:"942f3d7", t:"HTTPS 없이는 모션 테스트 자체가 불가능했다",
+    symptom:"실기기에서 모션 센서가 아예 반응하지 않는다.",
+    cause:"iOS Safari는 보안 컨텍스트(HTTPS)가 아니면 devicemotion을 <b>차단</b>한다. http://&lt;LAN IP&gt;:5173으로는 원천 불가.",
+    fix:"터널로 HTTPS 주소를 열고 vite dev 서버가 그 호스트를 거부하지 않도록 허용 목록을 뒀다(dev 전용, 빌드 무영향). 모션 튜닝 전용 /__dev/motion 화면도 함께." },
+  { id:"C24", p:"P6", sev:"mid", layer:"FE", commit:"FND-4", t:"모바일 대기실이 가로로 밀렸다",
+    symptom:"375px에서 대기실 진입 시 scrollWidth 425 > clientWidth 375.",
+    cause:"방 코드를 담은 grid 컨테이너에 min-w-0이 없었다. 부모는 min-w-0 flex-1이라 줄어들 수 있지만 <b>CSS Grid 아이템의 기본값은 min-width: auto</b>(내용 기준 최소폭)라 36px 방 코드 문자열보다 더 줄지 않는다. QR 고정폭 + gap + 그 최소폭 > 375px.",
+    fix:"행·텍스트 컨테이너 둘 다 min-w-0, 방 코드 폰트를 clamp()로 가변화, truncate를 안전망으로.",
+    note:"6자(현재 값)와 12자(ROOM_CODE_MAX_LENGTH) 양쪽으로 실측했다. 화면에 보이는 값만 보고 고치면 긴 값에서 다시 터진다." },
+  { id:"C25", p:"P6", sev:"mid", layer:"FE", commit:"FND-6", t:"대기실·결과 화면이 세로로 스크롤됐다",
+    symptom:"375×812에 6인이면 scrollHeight 942 > clientHeight 812.",
+    cause:"&lt;main&gt;이 min-h-dvh, 즉 <b>최소</b> 높이만 고정이라 컨텐츠가 커지면 그대로 페이지 스크롤로 흘러간다. 내부 스크롤 컨테이너가 없었다.",
+    fix:"main을 h-svh overflow-hidden으로, 목록 section을 min-h-0 flex-1 overflow-y-auto로. 초대 카드·시작 버튼은 고정 영역 유지.",
+    note:"게임 화면은 이미 이 패턴이었다 — <b>같은 앱 안의 다른 화면과 대조해서</b> 찾은 버그다." },
+
+  // P7
+  { id:"C26", p:"P7", sev:"crit", layer:"BE", commit:"8c3b650", t:"마감 처리를 클라이언트 자동 기록에 맡겼다",
+    symptom:"한 번도 굴리지 않았거나 탭이 백그라운드인 플레이어의 라운드가 점수판에 남지 않는다. 라운드 수와 최종 결과가 어긋난다.",
+    cause:"마감의 마무리를 클라가 해주기를 기대했다.",
+    fix:"서버가 마감을 끝까지 책임진다 — 자동 굴림 + 자동 기록." },
+  { id:"C27", p:"P7", sev:"high", layer:"BE", commit:"3d76376 · f42e319", t:"마감 점수 유실과 굴림 순서 미검증",
+    symptom:"점수가 사라지거나 순서가 뒤집힌 굴림이 통과된다.",
+    cause:"제한시간 갱신 시점이 불명확했고 굴림 순서를 서버가 검증하지 않았다. 클라는 낙관적으로 반영했다.",
+    fix:"굴림 완료마다 25초를 갱신하고 서버가 순서를 검증한다. WebSocket 전송을 직렬화하고, score.update ACK 이후 확정 상태를 반영하도록 바꿨다." },
+  { id:"C28", p:"P7", sev:"crit", layer:"BE", commit:"00c1955", t:"종료 직후 타이머가 다음 턴을 시작했다",
+    symptom:"게임이 끝난 뒤 한 턴이 더 시작되거나 종료가 중복 방송된다.",
+    cause:"종료 판정과 타이머 정지의 순서가 정해져 있지 않았다.",
+    fix:"타이머 정지 → phase CAS 전이 → 방송 순서를 고정. CAS가 실패하면(이미 다른 호출이 종료시킴) 방송하지 않아 중복이 없다. 단, 판정 전에 타이머를 멈추면 진행 중 게임이 멈추므로 <b>전이 성공 뒤에만</b> 정지한다." },
+  { id:"C29", p:"P7", sev:"high", layer:"BE", commit:"f53ca6a", t:"오프라인 플레이어의 턴을 25초씩 기다렸다",
+    symptom:"돌아오지 않는 사람 차례마다 전원이 25초를 낭비한다.",
+    cause:"턴 시작이 온라인 여부를 보지 않았다.",
+    fix:"턴 주인이 오프라인이면 타이머를 걸지 않고 즉시 진행 — 첫 턴은 점수 없이 스킵, 2번째는 자동 퇴장. 스킵 후 다음 턴도 advanceTurn을 거쳐 다시 돌아오므로 연속 오프라인도 연쇄 처리된다.",
+    note:"명단에 없는 플레이어(비정상 상태)도 오프라인으로 본다 — “연결이 없다”는 사실은 같다." },
+
+  // P8
+  { id:"C30", p:"P8", sev:"crit", layer:"INFRA", commit:"6487b19", t:"백엔드 테스트가 컴파일조차 되지 않았다",
+    symptom:"develop에서 백엔드 테스트를 한 개도 돌릴 수 없었다. 아무도 몰랐다.",
+    cause:"오프라인 턴 스킵 수정에서 RoundTimerService 생성자에 인자 3개가 늘었는데 테스트가 갱신되지 않아 compileTestJava가 실패. <b>즉 CI가 백엔드를 전혀 검증하지 못하고 있었다.</b>",
+    fix:"먼저 컴파일만 되돌리고(범위를 의도적으로 좁혀서), 실패 원인이 다른 7건은 후속 커밋에서 처리했다. 13건 → 5건(전부 Docker 필요 통합 테스트).",
+    note:"이번 QA에서 찾은 문제 상당수가 여기서 파생됐다. 가장 중요한 제안 — CI에 백엔드 테스트를 게이트로 걸 것." },
+  { id:"C31", p:"P8", sev:"mid", layer:"INFRA", commit:"1f5e1bc", t:"테스트가 없는 버그를 날조했다",
+    symptom:"explicitLeaveStillRemovesPlayingMember가 계속 빨간데 프로덕션 코드는 멀쩡했다.",
+    cause:"roundTimerService를 mock으로 둔 채 <b>그 mock 안에서 일어나는</b> registry 제거를 단언했다. 실제 RoundTimerService.removePlayer는 registry.removePlayer를 정상 호출한다.",
+    fix:"핸들러의 책임은 “팬아웃에서 빼고 removePlayer에 위임”까지이므로 거기까지만 검증한다. 명단 제거·턴 순서 정리는 RoundTimerService의 몫.",
+    note:"mock 경계 안쪽을 단언하면 테스트가 영영 빨개지거나 반대로 영영 초록이 된다." },
+  { id:"C32", p:"P8", sev:"mid", layer:"INFRA", commit:"7e59921", t:"기능 추가가 테스트의 암묵적 전제를 무효화했다",
+    symptom:"RoundTimerServiceTest 7건이 한꺼번에 실패.",
+    cause:"테스트의 registry가 비어 있어 새로 생긴 오프라인 분기가 <b>전원을 오프라인으로 판정</b>하고 타이머를 아예 걸지 않았다.",
+    fix:"참가자를 명단에 올리는 6줄로 복구. 새 분기를 넣을 땐 “이 분기의 false 조건이 기존 테스트에서 성립하나”를 확인해야 한다." },
+  { id:"C33", p:"P8", sev:"mid", layer:"INFRA", commit:"f0627a8", t:"병렬 실행에서만 터지는 flake",
+    symptom:"QR 중복 제출 테스트가 전체 스위트에서만 가끔 실패.",
+    cause:"목 응답이 두 번째 클릭보다 먼저 완료되면 제출 가드가 풀려 joinRoom이 두 번 호출됐다.",
+    fix:"mockApiError에 until 옵션을 추가해 두 클릭이 모두 도달할 때까지 응답을 보류한다. 대기 시간을 늘리는 대신 <b>순서를 고정</b>해 결정적으로 만들었다." },
+  { id:"C34", p:"P8", sev:"mid", layer:"INFRA", commit:"d91af53 · b92b99d", t:"린트 억제 주석의 위치 때문에 배포가 실패했다",
+    symptom:"배포 파이프라인이 biome check에서 멈춘다.",
+    cause:"억제 주석이 요소 위에 있어 효력이 없었고(unused suppression), noNoninteractiveTabindex 에러가 그대로 남았다.",
+    fix:"주석을 tabIndex 속성 위로 이동. 별건의 useExhaustiveDependencies는 “두 값이 바뀌면 렌더된 텍스트 폭이 달라져 다시 측정해야 한다”는 <b>사유를 적어</b> 억제했다." },
+  { id:"C35", p:"P8", sev:"note", layer:"INFRA", commit:"—", t:"mock이 항상 “대기 중”이라고 우겼다",
+    symptom:"게임 진행 중 새로고침 → 이어서 하기 → 라운드·점수가 전부 사라진 신규 대기실로 보인다.",
+    cause:"mock의 room.join이 항상 정적 waiting 스냅샷을 반환했다. RealtimeSync의 keepGameState()는 “서버가 waiting이라 하면 신뢰한다”는 <b>의도된</b> 로직이라, mock이 우기면 진행 상태가 매번 날아간다. <b>FE 버그가 아니다.</b>",
+    fix:"mock 방 상태를 sessionStorage에 둔다 — 새로고침을 넘어 살아남아야 재접속 시나리오가 성립하기 때문. 게임 시작이 저장, room.join이 새 마감 시각과 함께 복원, 나가기가 삭제.",
+    note:"mock의 거짓말은 FE 버그로 오인되기 딱 좋다. “실서버면 재현되지 않을 것”이라는 판단 근거를 기록에 남긴 게 이 사례의 핵심." },
+  { id:"C36", p:"P8", sev:"crit", layer:"INFRA", commit:"f6d0c69", t:"main이 빈 트리였다",
+    symptom:"세션 초반 main 브랜치에 파일이 하나도 없었다.",
+    cause:"과거 revert 커밋이 저장소 전체를 지웠다 — <b>머지 커밋 revert 시 부모 선택 실수로 추정</b>.",
+    fix:"release 브랜치를 squash 병합해 359개 파일 복구.",
+    note:"재발 방지는 “main에 직접 머지하지 않는다” 규칙을 지키는 것뿐이다. 기술적 방어책이 없다." },
+];
+
+const SEV_LABEL = { crit: "치명", high: "높음", mid: "중간", note: "참고" };
+const LAYER_LABEL = { BE: "백엔드", FE: "프론트", INFRA: "인프라" };
+
+const host = document.getElementById("patterns");
+const frag = document.createDocumentFragment();
+
+for (const pat of PATTERNS) {
+  const mine = CASES.filter((c) => c.p === pat.code);
+  const sec = document.createElement("section");
+  sec.className = "pattern";
+  sec.dataset.pattern = pat.code;
+
+  const head = document.createElement("div");
+  head.className = "pattern-head";
+  head.innerHTML =
+    '<div class="pattern-code">' + pat.code + "</div>" +
+    "<div>" +
+      '<h3 class="pattern-title">' + pat.title + " <span style=\"color:var(--ink-faint);font-family:var(--mono);font-size:0.8rem;font-weight:400\">" + mine.length + "건</span></h3>" +
+      '<p class="pattern-def">' + pat.def + "</p>" +
+      '<p class="pattern-rule"><b>막는 규칙</b> · ' + pat.rule + "</p>" +
+    "</div>";
+  sec.appendChild(head);
+
+  for (const c of mine) {
+    const d = document.createElement("details");
+    d.className = "case sev-" + c.sev;
+    d.dataset.sev = c.sev;
+    d.dataset.layer = c.layer;
+    d.dataset.text = (c.id + " " + c.t + " " + c.symptom + " " + c.cause + " " + c.fix + " " + (c.note || "") + " " + c.commit).toLowerCase();
+
+    const sum = document.createElement("summary");
+    sum.innerHTML =
+      '<span class="case-id"><span class="tick"></span>' + c.id + "</span>" +
+      '<span class="case-title">' + c.t + "</span>" +
+      '<span class="case-meta"><em>' + SEV_LABEL[c.sev] + "</em> · " + LAYER_LABEL[c.layer] + "</span>";
+    d.appendChild(sum);
+
+    const dl = document.createElement("dl");
+    dl.className = "case-body";
+    let rows =
+      "<dt>증상</dt><dd>" + c.symptom + "</dd>" +
+      "<dt>진짜 원인</dt><dd>" + c.cause + "</dd>" +
+      "<dt>처방</dt><dd>" + c.fix + "</dd>";
+    if (c.note) rows += "<dt>남는 얘기</dt><dd class=\"muted\">" + c.note + "</dd>";
+    dl.innerHTML = rows;
+    d.appendChild(dl);
+
+    sec.appendChild(d);
+  }
+  frag.appendChild(sec);
+}
+host.appendChild(frag);
+
+// ---- filtering ----
+const q = document.getElementById("q");
+const countEl = document.getElementById("count");
+const chips = Array.from(document.querySelectorAll(".chip"));
+const allCases = Array.from(document.querySelectorAll(".case"));
+const allPatterns = Array.from(document.querySelectorAll(".pattern"));
+
+function activeSet(attr) {
+  return chips.filter((c) => c.dataset[attr] && c.getAttribute("aria-pressed") === "true").map((c) => c.dataset[attr]);
+}
+
+function apply() {
+  const term = q.value.trim().toLowerCase();
+  const sevs = activeSet("sev");
+  const layers = activeSet("layer");
+  let shown = 0;
+
+  for (const el of allCases) {
+    const ok =
+      (!term || el.dataset.text.includes(term)) &&
+      (sevs.length === 0 || sevs.includes(el.dataset.sev)) &&
+      (layers.length === 0 || layers.includes(el.dataset.layer));
+    el.hidden = !ok;
+    if (ok) shown++;
+  }
+  for (const p of allPatterns) {
+    p.hidden = !Array.from(p.querySelectorAll(".case")).some((c) => !c.hidden);
+  }
+  countEl.textContent = shown + " / " + allCases.length + "건";
+}
+
+q.addEventListener("input", apply);
+for (const chip of chips) {
+  chip.addEventListener("click", () => {
+    chip.setAttribute("aria-pressed", chip.getAttribute("aria-pressed") === "true" ? "false" : "true");
+    apply();
+  });
+}
+apply();
+
+// ---- lens tabs ----
+const tabs = Array.from(document.querySelectorAll(".lens-btn"));
+tabs.forEach((tab, i) => {
+  tab.addEventListener("click", () => {
+    tabs.forEach((t) => {
+      const on = t === tab;
+      t.setAttribute("aria-selected", on ? "true" : "false");
+      document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
+    });
+  });
+  tab.addEventListener("keydown", (e) => {
+    const dir = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+    if (!dir) return;
+    e.preventDefault();
+    const next = tabs[(i + dir + tabs.length) % tabs.length];
+    next.focus();
+    next.click();
+  });
+});
+</script>
+
+</body>
+</html>

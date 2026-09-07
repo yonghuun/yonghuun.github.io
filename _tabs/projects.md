@@ -5,6 +5,30 @@ order: 2
 ---
 
 <div class="portfolio-project-grid">
+  <article id="safeflow" class="portfolio-project-card portfolio-project-card--featured" tabindex="-1">
+    <div class="portfolio-card-heading">
+      <div><p class="portfolio-eyebrow">DATA · AI · INDUSTRIAL SAFETY</p><h2>SafeFlow</h2></div>
+      <span class="portfolio-status portfolio-status--progress">개발 진행 중</span>
+    </div>
+    <p>국내 법령과 산업재해 데이터를 연결해 사업장의 위험성평가를 지원하는 서비스</p>
+    <div class="portfolio-metric-row" aria-label="법령 검색 파이프라인 진행 결과">
+      <span><strong>1,294조</strong> 법령 원문 <small>7개 법령 · 결측 0건</small></span>
+      <span><strong>3,767</strong> 검색 청크 <small>120토큰 상한 검증</small></span>
+      <span><strong>10/10</strong> Hit@5 <small>위험 상황 스모크 테스트</small></span>
+    </div>
+    <h3>담당 및 진행 상황</h3>
+    <ul>
+      <li>OIICS 코드 롤업 및 재해 분류 전처리 완료</li>
+      <li>법령 조문 구조를 보존하는 혼합 청킹과 임베딩 인덱스 구현</li>
+      <li>원천·코퍼스 해시와 모델 정보를 남기는 재현 가능한 배치 구성</li>
+      <li>Spark 위험요인 집계와 법령 RAG 검색 파이프라인 순차 진행</li>
+    </ul>
+    <p class="portfolio-tech-list">Python · Pandas · PyArrow · Sentence Transformers · RAG</p>
+    <div class="portfolio-actions">
+      <a class="portfolio-button" href="/posts/safeflow-law-rag-corpus/">법령 코퍼스 구축기</a>
+    </div>
+  </article>
+
   <article id="tripcrew" class="portfolio-project-card portfolio-project-card--featured" tabindex="-1">
     <div class="portfolio-card-heading">
       <div><p class="portfolio-eyebrow">BACKEND · TRAVEL PLATFORM</p><h2>TripCrew</h2></div>
